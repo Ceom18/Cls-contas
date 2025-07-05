@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cls_Aluguel FF</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+    }
+
+    header {
+      background: linear-gradient(90deg, #0057b7, #b70000);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+    }
+
+    header h1 {
+      margin: 10px 0 0;
+      font-size: 1.8rem;
+      color: #fff;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      background: #222;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      background: #0057b7;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    nav button.active {
+      background: #b70000;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: #222;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px #000;
+      white-space: pre-wrap;
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 4px;
+    }
+
+    .card h3 {
+      margin: 0 0 5px 0;
+      text-align: left;
+      color: #b70000;
+    }
+
+    .card p {
+      margin: 5px 0;
+    }
+
+    .card .preco {
+      font-weight: bold;
+      color: #0057b7;
+    }
+
+    .card a {
+      color: #fff;
+      background: #0057b7;
+      padding: 8px 12px;
+      text-decoration: none;
+      border-radius: 5px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .card .delete-btn {
+      background: #b70000;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    #creatorLogin, #creatorPanel {
+      text-align: center;
+      padding: 20px;
+    }
+
+    #creatorPanel {
+      display: none;
+      border-top: 2px solid #b70000;
+      margin-top: 20px;
+    }
+
+    #creatorPanel input, #creatorPanel textarea {
+      width: 90%;
+      margin: 5px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #333;
+      color: #eee;
+    }
+
+    #creatorPanel textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+    }
+
+    #creatorPanel button {
+      background: #b70000;
+      color: #fff;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #addComment {
+      background: #222;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 8px;
+    }
+
+    #addComment textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      background: #333;
+      color: #eee;
+      border: none;
+    }
+
+    #addComment button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #0057b7;
+      border: none;
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #commentsSection {
+      padding: 20px;
+    }
+
+    #toggleCommentsBtn {
+      background: #0057b7;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 20px;
+      display: block;
+      max-width: 200px;
+    }
+
+    #commentsList {
+      margin-top: 15px;
+    }
+
+    .comment-bubble {
+      background: #333;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      max-width: 90%;
+      word-wrap: break-word;
+      box-shadow: 0 0 5px #000;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      text-align: center;
+      padding: 10px;
+      color: #ccc;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-top: 1px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://i.imgur.com/1jG8wRa.png" alt="Foto Perfil" id="perfilHeader" />
+    <h1>Cls_Aluguel FF</h1>
+  </header>
+
+  <nav>
+    <button class="filter active" data-type="all">Todas</button>
+    <button class="filter" data-type="comum">Comum</button>
+    <button class="filter" data-type="intermediaria">Intermediária</button>
+    <button class="filter" data-type="rara">Rara</button>
+    <button class="filter" data-type="lendaria">Lendária</button>
+  </nav>
+
+  <div class="cards" id="cards"></div>
+
+  <div id="addComment">
+    <h2>Deixe seu comentário</h2>
+    <textarea id="commentText" rows="4" placeholder="Digite algo..."></textarea><br />
+    <button onclick="addComment()">Enviar</button>
+  </div>
+
+  <button id="toggleCommentsBtn" onclick="toggleComments()">Mostrar/Ocultar Comentários</button>
+
+  <div id="commentsSection">
+    <h3>Comentários:</h3>
+    <div id="commentsList"></div>
+  </div>
+
+  <div id="creatorLogin" style="display:none;">
+    <input type="password" id="adminPass" placeholder="Senha do criador" />
+    <button onclick="showPanel()">Entrar</button>
+  </div>
+
+  <div id="creatorPanel">
+    <h2>Painel do Criador</h2>
+    <input type="text" id="nome" placeholder="Nome da Conta" />
+    <textarea id="desc" placeholder="Descrição"></textarea>
+    <input type="text" id="preco" placeholder="Preço" />
+    <input type="text" id="link" placeholder="Link Instagram" />
+    <input type="text" id="raridade" placeholder="Raridade (comum, intermediaria, rara, lendaria)" />
+    <input type="file" id="imagemConta" accept="image/*" />
+    <button onclick="addCard()">Adicionar Conta</button>
+    <input type="file" id="perfilFile" accept="image/*" />
+    <button onclick="trocarPerfilFile()">Atualizar Foto de Perfil</button>
+    <button onclick="closePanel()" style="background: #444; margin-left: 10px;">Fechar Painel</button>
+  </div>
+
+  <footer onclick="handleTripleClick()">criador ceom @cls_contas_ff</footer>
+
+  <script>
+    const senha = "******"; // coloque sua senha aqui
+    let cards = [];
+    let isLoggedIn = false;
+    let clickTimes = [];
+
+    const cardsEl = document.getElementById("cards");
+    const commentsList = document.getElementById("commentsList");
+    const commentsSection = document.getElementById("commentsSection");
+    const toggleCommentsBtn = document.getElementById("toggleCommentsBtn");
+    const filters = document.querySelectorAll(".filter");
+    const creatorLogin = document.getElementById("creatorLogin");
+
+    if (localStorage.getItem("cardsData")) {
+      cards = JSON.parse(localStorage.getItem("cardsData"));
+    }
+
+    function salvarCards() {
+      localStorage.setItem("cardsData", JSON.stringify(cards));
+    }
+
+    function renderCards(type = "all") {
+      cardsEl.innerHTML = "";
+      cards.filter(c => type === "all" || c.raridade === type).forEach((c, index) => {
+        let cardHTML = `
+          <div class="card">
+            <h3 style="text-align:left; margin: 0 0 5px 0;">${c.nome}</h3>
+            <img src="${c.imagem}" />
+            <p>${c.descricao}</p>
+            <p class="preco">${c.preco}</p>
+            <a href="${c.link}" target="_blank">Alugar</a>
+        `;
+        if (isLoggedIn) {
+          cardHTML += `<br><button class="delete-btn" onclick="deleteCard(${index})">Excluir</button>`;
+        }
+        cardHTML += `</div>`;
+        cardsEl.innerHTML += cardHTML;
+      });
+    }
+
+    filters.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filters.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderCards(btn.dataset.type);
+      });
+    });
+
+    function addCard() {
+      const fileInput = document.getElementById("imagemConta");
+      const file = fileInput.files[0];
+      if (!file) return alert("Escolha uma imagem da conta!");
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        const card = {
+          nome: document.getElementById("nome").value,
+          descricao: document.getElementById("desc").value,
+          preco: document.getElementById("preco").value,
+          link: document.getElementById("link").value,
+          raridade: document.getElementById("raridade").value.toLowerCase(),
+          imagem: e.target.result
+        };
+        cards.push(card);
+        salvarCards();
+        renderCards();
+        alert("Conta adicionada!");
+
+        // Limpar campos
+        document.getElementById("nome").value = "";
+        document.getElementById("desc").value = "";
+        document.getElementById("preco").value = "";
+        document.getElementById("link").value = "";
+        document.getElementById("raridade").value = "";
+        fileInput.value = "";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function deleteCard(index) {
+      if (isLoggedIn && confirm("Tem certeza?")) {
+        cards.splice(index, 1);
+        salvarCards();
+        renderCards();
+      }
+    }
+
+    function showPanel() {
+      const input = document.getElementById("adminPass").value;
+      if (input === senha) {
+        isLoggedIn = true;
+        document.getElementById("creatorPanel").style.display = "block";
+        document.getElementById("creatorLogin").style.display = "none";
+        document.querySelector("footer").style.display = "none";
+        renderCards();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
+
+    function closePanel() {
+      document.getElementById("creatorPanel").style.display = "none";
+      document.getElementById("creatorLogin").style.display = "none";
+      document.querySelector("footer").style.display = "block";
+      isLoggedIn = false;
+      renderCards();
+    }
+
+    function addComment() {
+      const text = document.getElementById("commentText").value;
+      if (text.trim() !== "") {
+        const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+        comments.push(text);
+        localStorage.setItem("comments", JSON.stringify(comments));
+        document.getElementById("commentText").value = "";
+        loadComments();
+      }
+    }
+
+    function loadComments() {
+      const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+      commentsList.innerHTML = comments.map(c => `<div class="comment-bubble">${c}</div>`).join("");
+    }
+
+    function toggleComments() {
+      if (commentsSection.style.display === "none") {
+        commentsSection.style.display = "block";
+        toggleCommentsBtn.textContent = "Ocultar Comentários";
+      } else {
+        commentsSection.style.display = "none";
+        toggleCommentsBtn.textContent = "Mostrar Comentários";
+      }
+    }
+
+    function trocarPerfilFile() {
+      const fileInput = document.getElementById("perfilFile");
+      const file = fileInput.files[0];
+      if (!file) return alert("Escolha uma imagem!");
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById("perfilHeader").src = e.target.result;
+        localStorage.setItem("fotoPerfil", e.target.result);
+        alert("Foto atualizada!");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleTripleClick() {
+      const now = Date.now();
+      clickTimes.push(now);
+      if (clickTimes.length > 3) clickTimes.shift();
+      if (clickTimes.length === 3 && clickTimes[2] - clickTimes[0] < 3000) {
+        creatorLogin.style.display = "block";
+        creatorLogin.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    const imgSalva = localStorage.getItem("fotoPerfil");
+    if (imgSalva) document.getElementById("perfilHeader").src = imgSalva;
+
+    loadComments();
+    renderCards();
+  </script>
+</body>
+</html>
